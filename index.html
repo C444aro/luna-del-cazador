@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>La Luna del Cazador</title>
+<meta name="description" content="Entrada a la experiencia: galería, instrucciones y activación de la cámara.">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-page="index">
+<div id="stage" aria-label="Vista en primera persona de La Luna del Cazador. Arrastra para mirar alrededor.">
+  <canvas id="scene"></canvas>
+  <div id="css3d" class="off"></div>
+</div>
+<div id="loader" class="layer"><div><p>La Luna del Cazador</p><div class="bar"><i></i></div></div></div>
+<div id="fade" class="layer"></div>
+<section id="camgate" class="layer" aria-labelledby="gateT">
+  <div class="card">
+    <h2 id="gateT">Usa tus manos</h2>
+    <p>La experiencia sigue tus manos con la cámara. Así se mueve:</p>
+    <div class="gestures">
+      <figure><svg viewBox="0 0 100 120" aria-hidden="true"><g class="hand aimm"><rect x="31" y="56" width="42" height="44" rx="16" class="skin"/><g class="idx"><rect x="34" y="12" width="12" height="52" rx="6" class="skin"/></g><rect x="46" y="46" width="11" height="18" rx="5.5" class="skin"/><rect x="56" y="48" width="10.5" height="16" rx="5.2" class="skin"/><rect x="64.5" y="52" width="9.5" height="14" rx="4.8" class="skin"/><rect x="20" y="64" width="12" height="26" rx="6" transform="rotate(-25 26 77)" class="skin"/><rect x="40" y="98" width="26" height="18" class="sleeve"/></g></svg><figcaption><b>Apunta</b>Levanta el índice para mover el cursor.</figcaption></figure>
+      <figure><svg viewBox="0 0 110 120" aria-hidden="true"><rect x="16" y="70" width="42" height="40" rx="16" class="skin"/><g class="pidx"><rect x="40" y="16" width="12" height="64" rx="6" class="skin" transform="rotate(28 46 78)"/></g><g class="pthb"><rect x="40" y="40" width="12" height="46" rx="6" class="skin" transform="rotate(84 46 84)"/></g><circle cx="84" cy="50" r="6" class="ripple"/><rect x="24" y="104" width="26" height="14" class="sleeve"/></svg><figcaption><b>Selecciona</b>Junta la punta del pulgar con la del índice.</figcaption></figure>
+      <figure><svg viewBox="0 0 120 120" aria-hidden="true"><path d="M14 60h14M14 60l6-6M14 60l6 6M106 60H92M106 60l-6-6M106 60l-6 6" class="dir"/><g class="fistm"><rect x="38" y="44" width="44" height="50" rx="17" class="skin"/><rect x="40" y="38" width="10" height="16" rx="5" class="skin"/><rect x="50" y="36" width="10" height="16" rx="5" class="skin"/><rect x="60" y="37" width="10" height="16" rx="5" class="skin"/><rect x="70" y="40" width="9.5" height="15" rx="4.8" class="skin"/><rect x="30" y="58" width="12" height="22" rx="6" transform="rotate(-30 36 69)" class="skin"/><rect x="48" y="92" width="26" height="18" class="sleeve"/></g></svg><figcaption><b>Gira 360°</b>Cierra el puño y mueve la mano.</figcaption></figure>
+    </div>
+    <p class="note">Todas las tarjetas con un marco dorado que brilla son interactivas: apunta y selecciónalas.</p>
+    <p class="small">Todo ocurre en tu navegador: el video no se graba ni se envía. Sin cámara puedes usar el trackpad.</p>
+    <div class="row"><button class="btn" id="camOn" type="button">Activar cámara</button><button class="btn ghost" id="camOff" type="button">Usar trackpad</button></div>
+    <p class="small" id="camMsg" aria-live="polite"></p>
+  </div>
+</section>
+<div id="camview" hidden><video id="camvid" playsinline muted></video><canvas id="camdraw" width="176" height="132"></canvas><div id="camtxt">Muestra tu mano a la cámara</div></div>
+<div id="hcur" hidden><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" class="bg"/><circle id="hring" cx="24" cy="24" r="6" class="dot"/></svg></div>
+<button id="musicBtn" class="btn" type="button" hidden aria-pressed="true"><span>Música: sí</span></button>
+<div id="hud" class="layer">
+  <div id="live"><i></i><span id="liveTxt">Tiempo real</span></div>
+  <div id="actions" class="sr"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script src="main.js"></script>
+</body>
+</html>

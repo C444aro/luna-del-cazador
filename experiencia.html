@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Experiencia · La Luna del Cazador</title>
+<meta name="description" content="Domo con la Luna del Cazador y sus datos en tiempo real.">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-page="experiencia">
+<div id="stage" aria-label="Vista en primera persona de La Luna del Cazador. Arrastra para mirar alrededor.">
+  <canvas id="scene"></canvas>
+  <div id="css3d" class="off"></div>
+</div>
+<div id="loader" class="layer"><div><p>La Luna del Cazador</p><div class="bar"><i></i></div></div></div>
+<div id="fade" class="layer"></div>
+<div id="camview" hidden><video id="camvid" playsinline muted></video><canvas id="camdraw" width="176" height="132"></canvas><div id="camtxt">Muestra tu mano a la cámara</div></div>
+<div id="hcur" hidden><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" class="bg"/><circle id="hring" cx="24" cy="24" r="6" class="dot"/></svg></div>
+<button id="musicBtn" class="btn" type="button" hidden aria-pressed="true"><span>Música: sí</span></button>
+<button id="moonBack" class="btn" type="button" hidden><span class="arr" aria-hidden="true">←</span><span>Volver a la Luna</span></button>
+<div id="hud" class="layer">
+  <div id="live"><i></i><span id="liveTxt">Tiempo real</span></div>
+  <div id="actions" class="sr"></div>
+</div>
+<aside id="detail" role="dialog" aria-modal="false" aria-labelledby="dTitle">
+  <button class="x btn" type="button" id="dClose">Cerrar</button>
+  <h3 id="dTitle"></h3>
+  <div class="val" id="dVal"></div>
+  <div id="dBody"></div>
+</aside>
+<div id="pausa" class="layer" aria-live="polite">
+  <div class="wrap">
+    <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" stroke="rgba(241,210,160,.18)"/><circle id="pRing" cx="32" cy="32" r="30" stroke="#f1d2a0" stroke-dasharray="188.5" stroke-dashoffset="188.5"/></svg>
+    <div class="t" id="pTxt">Respira. Solo mira.</div>
+    <div class="s" id="pSub">Un minuto · haz clic para volver</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script src="main.js"></script>
+</body>
+</html>

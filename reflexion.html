@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Reflexión · La Luna del Cazador</title>
+<meta name="description" content="Mensaje de reflexión antes de entrar a la experiencia.">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-page="reflexion">
+<div id="stage" aria-label="Vista en primera persona de La Luna del Cazador. Arrastra para mirar alrededor.">
+  <canvas id="scene"></canvas>
+  <div id="css3d" class="off"></div>
+</div>
+<div id="loader" class="layer"><div><p>La Luna del Cazador</p><div class="bar"><i></i></div></div></div>
+<div id="fade" class="layer"></div>
+<section id="mensaje" class="layer" aria-live="polite">
+  <div class="inner">
+    <p>Vivimos mirando hacia abajo: al reloj, a la pantalla, a la siguiente obligación.</p>
+    <p>En nombre de un orden que no elegimos, dejamos pasar lo más simple, como el cielo de noche, y lo más valioso, como el tiempo con quienes amamos.</p>
+    <p>Trabajamos esperando una recompensa que tal vez nunca llegue.</p>
+    <p>Esta Luna del Cazador es una invitación a detenerte un minuto.</p>
+    <p class="big">A mirar arriba. A volver a pausar.</p>
+    <p>Nuestro tiempo aquí es limitado: no vinimos solo a sobrevivir, vinimos a vivir.</p>
+    <button class="btn go live" id="btnGo" type="button">Entrar</button>
+  </div>
+</section>
+<div id="camview" hidden><video id="camvid" playsinline muted></video><canvas id="camdraw" width="176" height="132"></canvas><div id="camtxt">Muestra tu mano a la cámara</div></div>
+<div id="hcur" hidden><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" class="bg"/><circle id="hring" cx="24" cy="24" r="6" class="dot"/></svg></div>
+<button id="musicBtn" class="btn" type="button" hidden aria-pressed="true"><span>Música: sí</span></button>
+
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script src="main.js"></script>
+</body>
+</html>
