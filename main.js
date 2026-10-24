@@ -1096,6 +1096,8 @@ async function start() {
   handsRig.visible = false;   // las manos de malla quedan reemplazadas por las manos de luz
   if (PAGE === 'index') {
     buildEntry(); entry.add(camera); renderPass.scene = entry; camera.position.set(0, 1.62, 15); look.pitch = look.tPitch = 0.08; showBar(ENTRY_FAR);
+  } else if (PAGE === 'reflexion') {
+    const black = new THREE.Scene(); black.background = new THREE.Color(0x000000); black.add(camera); renderPass.scene = black;   // la reflexión va sobre fondo negro
   } else {
     buildExp(); if (PAGE === 'experiencia') buildPanels();
     current = 'exp'; renderPass.scene = exp; exp.add(camera); look.free = true; look.pmin = -0.6; look.pmax = 1.15;
@@ -1108,7 +1110,7 @@ async function start() {
   // en reflexión y experiencia se mantienen la cámara y la música elegidas al inicio
   if (store.get('luna-cam') === 'on') startCamera();
   if (store.get('luna-music') !== 'off') { startMusic(); resumeMusicOnGesture(); }
-  if (PAGE === 'reflexion') { setFade(0.78); showMessage(); }
+  if (PAGE === 'reflexion') { setFade(1); showMessage(); }
   if (PAGE === 'experiencia') enterExperience();
 }
 start().catch(err => { console.error(err); $('#loader').querySelector('p').textContent = 'No se pudo cargar la experiencia. Recarga la página.'; });
