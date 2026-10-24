@@ -728,7 +728,8 @@ function stepTween(dt) {
 }
 const stage = $('#stage');
 const ptr = { down: false, x: 0, y: 0, moved: 0, ndc: new THREE.Vector2(-9, -9), target: null };
-stage.addEventListener('pointerdown', e => { ptr.down = true; ptr.x = e.clientX; ptr.y = e.clientY; ptr.moved = 0; ptr.target = e.target.closest('.p3'); });
+stage.addEventListener('pointerdown', e => { ptr.down = true; ptr.x = e.clientX; ptr.y = e.clientY; ptr.moved = 0; ptr.target = e.target.closest('.p3');
+  ptr.ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); });   // también funciona con toques y clics sin mover el cursor antes
 addEventListener('pointermove', e => {
   ptr.ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); handState.px = ptr.ndc.x; handState.py = ptr.ndc.y;
   if (ptr.down && !busy && !paused) { const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y; ptr.moved += Math.abs(dx) + Math.abs(dy); ptr.x = e.clientX; ptr.y = e.clientY;
@@ -739,7 +740,7 @@ addEventListener('pointerup', e => {
   if (!click) return;
   if (paused) { endPause(); return; }
   if (ptr.target) { const id = ptr.target.dataset.id === 'header' ? 'hunter' : ptr.target.dataset.id; select(ptr.target.dataset.id); openDetail(id); return; }
-  if (e.target === canvas) onClick();
+  if (e.target === canvas) { ptr.ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); hovered = null; onClick(); }
 });
 stage.addEventListener('wheel', e => { e.preventDefault(); if (busy || paused) return; look.tYaw += e.deltaX * 0.0022; look.tPitch += e.deltaY * 0.0018; clampLook(); }, { passive: false });
 addEventListener('keydown', e => {
