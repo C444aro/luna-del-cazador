@@ -18,8 +18,9 @@ const MOON_SRC = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAUDBAQ
 const HAND_R = "", HAND_L = "";   // (manos de malla anteriores; ya no se usan)
 const FONT = '"Avenir LC","Avenir Next","Avenir",sans-serif';
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const PAGE = document.body.dataset.page || 'index';   // 'index' · 'reflexion' · 'experiencia'
+let PAGE = document.body.dataset.page || 'index';   // 'index' · 'reflexion' · 'experiencia'
 const $ = s => document.querySelector(s) || (s === '#camdraw' ? document.createElement('canvas') : document.createElement('div'));   // cada página solo trae sus elementos
+const on = (sel, ev, fn) => document.addEventListener(ev, e => { const t = e.target && e.target.closest && e.target.closest(sel); if (t) fn(e, t); });   // también sirve para elementos que llegan después
 const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
 
 /* ================= DATOS ================= */
@@ -819,8 +820,8 @@ async function startCamera() {
 }
 function openGate() { $('#camgate').classList.add('on'); }
 function closeGate() { $('#camgate').classList.remove('on'); }
-$('#camOn').addEventListener('click', () => { startMusic(); startCamera(); });
-$('#camOff').addEventListener('click', () => { store.set('luna-cam', 'off'); startMusic(); closeGate(); });
+on('#camOn', 'click', () => { startMusic(); startCamera(); });
+on('#camOff', 'click', () => { store.set('luna-cam', 'off'); startMusic(); closeGate(); });
 function selectAt(x, y) {
   if (paused) { endPause(); return; }
   const el = document.elementFromPoint(x, y), b = el && el.closest('button');
@@ -918,12 +919,12 @@ function resumeMusicOnGesture() {
 }
 function musicMood(soft) { if (!music.ctx) return; const t = music.ctx.currentTime; music.lp.frequency.cancelScheduledValues(t); music.lp.frequency.linearRampToValueAtTime(soft ? 800 : 1400, t + 3); }
 function updateMusicBtn() { const b = $('#musicBtn'); b.hidden = !music.ctx; b.querySelector('span').textContent = music.on ? 'Música: sí' : 'Música: no'; b.setAttribute('aria-pressed', String(music.on)); }
-$('#musicBtn').addEventListener('click', toggleMusic);
+on('#musicBtn', 'click', toggleMusic);
 document.addEventListener('visibilitychange', () => { if (!music.ctx) return; document.hidden ? music.ctx.suspend() : music.on && music.ctx.resume(); });
 
 /* ================= FLUJO ================= */
-const actions = $('#actions'), fade = $('#fade');
-function setActions(list) { actions.innerHTML = ''; list.forEach(([txt, dir, act]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = txt.replace('\n', ' '); b.onclick = () => { if (!busy) { tapHand(); runAction(act); } }; actions.appendChild(b); }); }
+const fade = $('#fade');
+function setActions(list) { const actions = $('#actions'); actions.innerHTML = ''; list.forEach(([txt, dir, act]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = txt.replace('\n', ' '); b.onclick = () => { if (!busy) { tapHand(); runAction(act); } }; actions.appendChild(b); }); }
 function showBar(list) { setBar(list); setActions(list); }
 const ENTRY_FAR = [['Acércate a\nlas instrucciones', 'up', 'acercar'], ['Entrar a la\nexperiencia', 'up', 'entrar']];
 const ENTRY_NEAR = [['Alejarte', 'down', 'alejar'], ['Entrar a la\nexperiencia', 'up', 'entrar']];
@@ -945,7 +946,7 @@ async function runAction(act) {
     if (camera.position.x > 3) path.push(new THREE.Vector3(3.2, 1.62, 6.5));
     path.push(new THREE.Vector3(-0.1, 1.62, 6), new THREE.Vector3(-0.1, 1.62, 0.4), new THREE.Vector3(-0.1, 1.62, -2.6), new THREE.Vector3(-0.1, 1.62, -7.5));
     await moveAlong(path, 0, 0.02, path.length > 4 ? 8 : 7, { onProgress: k => setFade(Math.min(1, Math.max(0, (k - 0.5) / 0.42)) ** 1.4) });
-    setFade(1); await wait(300); location.href = 'reflexion.html';
+    setFade(1); await wait(300); if (await goPage('reflexion')) enterReflexion();
   } else if (act === 'subir') {
     showBar([]);
     await moveAlong([VIEW.top], 0, 0.2, 8.5, { fn: climbPos });
@@ -962,15 +963,16 @@ async function runAction(act) {
   else if (act === 'inicio') goHome();
 }
 async function goHome() {
-  showBar([]); closeDetail(); busy = true; await fadeTo(1, 1400); location.href = 'index.html';
+  showBar([]); closeDetail(); if (paused) { paused = false; $('#pausa').classList.remove('on'); handState.mode = 'idle'; musicMood(false); $('#css3d').classList.remove('dim'); }
+  busy = true; await fadeTo(1, 1400); busy = false; if (await goPage('index')) enterIndex(true);
 }
 function showMessage() {
   const m = $('#mensaje'); m.classList.add('on'); const ps = [...m.querySelectorAll('p')];
   ps.forEach((p, i) => setTimeout(() => p.classList.add('show'), REDUCED ? 0 : 800 + i * 2000));
   setTimeout(() => $('#btnGo').classList.add('show'), REDUCED ? 0 : 800 + ps.length * 2000);
 }
-$('#btnGo').addEventListener('click', async () => {
-  $('#btnGo').disabled = true; $('#mensaje').classList.remove('on'); await fadeTo(1, 1600); location.href = 'experiencia.html';
+on('#btnGo', 'click', async (e, b) => {
+  if (b.disabled) return; b.disabled = true; $('#mensaje').classList.remove('on'); await fadeTo(1, 1600); if (await goPage('experiencia')) enterExperiencePage();
 });
 async function enterExperience() {   // llegada a la sala: se aclara el negro mientras caminas hacia la escalera
   setFade(1); await wait(300);
@@ -1020,9 +1022,9 @@ function openDetail(id, silent) {
   if (!silent) $('#detail').classList.add('on');
 }
 function closeDetail() { detailOpen = null; $('#detail').classList.remove('on'); }
-$('#dClose').addEventListener('click', closeDetail);
-const moonBtn = $('#moonBack');
-moonBtn.addEventListener('click', () => { if (busy || paused) return; closeDetail(); tapHand(); const t = Math.round(look.yaw / (Math.PI * 2)) * Math.PI * 2; moveAlong([camera.position.clone()], t, onTop ? 0.2 : 0.12, 1.8, { walk: false }); });
+on('#dClose', 'click', closeDetail);
+let moonBtn = $('#moonBack');
+on('#moonBack', 'click', () => { if (busy || paused) return; closeDetail(); tapHand(); const t = Math.round(look.yaw / (Math.PI * 2)) * Math.PI * 2; moveAlong([camera.position.clone()], t, onTop ? 0.2 : 0.12, 1.8, { walk: false }); });
 function updateMoonBtn() {
   const yn = ((look.yaw % (Math.PI * 2)) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
   const show = current === 'exp' && !busy && !paused && Math.abs(yn) > 0.6 && !$('#css3d').classList.contains('off');
@@ -1094,15 +1096,9 @@ async function start() {
   await Promise.all([300, 400, 500, 800].map(w => document.fonts.load(`${w} 40px "Avenir LC"`)));
   moonTex = await new THREE.TextureLoader().loadAsync(MOON_SRC); moonTex.colorSpace = THREE.SRGBColorSpace; moonTex.anisotropy = 8;
   handsRig.visible = false;   // las manos de malla quedan reemplazadas por las manos de luz
-  if (PAGE === 'index') {
-    buildEntry(); entry.add(camera); renderPass.scene = entry; camera.position.set(0, 1.62, 15); look.pitch = look.tPitch = 0.08; showBar(ENTRY_FAR);
-  } else if (PAGE === 'reflexion') {
-    const black = new THREE.Scene(); black.background = new THREE.Color(0x000000); black.add(camera); renderPass.scene = black;   // la reflexión va sobre fondo negro
-  } else {
-    buildExp(); if (PAGE === 'experiencia') buildPanels();
-    current = 'exp'; renderPass.scene = exp; exp.add(camera); look.free = true; look.pmin = -0.6; look.pmax = 1.15;
-    camera.position.set(0, 1.62, 5.5); look.yaw = look.tYaw = 0; look.pitch = look.tPitch = 0.16;
-  }
+  if (PAGE === 'index') enterIndex(false);
+  else if (PAGE === 'reflexion') enterReflexion(true);
+  else prepareExperience();
   refresh(); resize();
   requestAnimationFrame(frame);
   $('#loader').style.opacity = 0; setTimeout(() => $('#loader').remove(), 1300);
@@ -1110,9 +1106,45 @@ async function start() {
   // en reflexión y experiencia se mantienen la cámara y la música elegidas al inicio
   if (store.get('luna-cam') === 'on') startCamera();
   if (store.get('luna-music') !== 'off') { startMusic(); resumeMusicOnGesture(); }
-  if (PAGE === 'reflexion') { setFade(1); showMessage(); }
   if (PAGE === 'experiencia') enterExperience();
 }
+/* --- Navegación lineal: cambia de página sin recargar, así la cámara, las manos y la música siguen --- */
+const pageFile = n => n === 'index' ? 'index.html' : n + '.html';
+async function goPage(name) {
+  const file = pageFile(name);
+  try {
+    if (location.protocol === 'file:') throw new Error('archivo local');
+    const html = await fetch(file, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
+    const doc = new DOMParser().parseFromString(html, 'text/html'), anchor = document.querySelector('body > script');
+    [...doc.body.children].forEach(el => { if (el.tagName === 'SCRIPT' || !el.id || el.id === 'loader' || document.getElementById(el.id)) return; document.body.insertBefore(document.importNode(el, true), anchor); });
+    document.title = doc.title; document.body.dataset.page = name; history.pushState({ page: name }, '', file);
+  } catch (e) { location.href = file; return false; }   // abierto con doble clic: el navegador no deja leer otra página local y se carga de forma normal
+  moonBtn = $('#moonBack'); PAGE = name; return true;
+}
+addEventListener('popstate', () => location.reload());
+let entryBuilt = false, expBuilt = false;
+function enterIndex(fromNav) {
+  if (!entryBuilt) { buildEntry(); entryBuilt = true; }
+  current = 'entry'; onTop = false; renderPass.scene = entry; entry.add(camera); $('#css3d').classList.add('off');
+  simOffset = 0; scrubAnim = null; look.free = false; look.pmin = -0.45; look.pmax = 0.6;
+  camera.position.set(0, 1.62, 15); look.yaw = look.tYaw = 0; look.pitch = look.tPitch = 0.08;
+  $('#mensaje').classList.remove('on'); $('#mensaje').querySelectorAll('p').forEach(p => p.classList.remove('show')); $('#btnGo').classList.remove('show'); $('#btnGo').disabled = false;
+  layoutBar(); refresh();
+  if (fromNav) { $('#hud').classList.add('on'); fadeTo(0, 1800).then(() => showBar(ENTRY_FAR)); } else showBar(ENTRY_FAR);
+}
+function enterReflexion(firstLoad) {
+  const black = new THREE.Scene(); black.background = new THREE.Color(0x000000); black.add(camera); renderPass.scene = black;   // la reflexión va sobre fondo negro
+  current = 'reflexion'; showBar([]); $('#hud').classList.remove('on'); $('#css3d').classList.add('off'); setFade(1);
+  $('#mensaje').querySelectorAll('p').forEach(p => p.classList.remove('show')); $('#btnGo').classList.remove('show'); $('#btnGo').disabled = false;
+  if (!firstLoad) showMessage(); else setTimeout(showMessage, 400);
+}
+function prepareExperience() {
+  if (!expBuilt) { buildExp(); buildPanels(); expBuilt = true; }
+  current = 'exp'; onTop = false; renderPass.scene = exp; exp.add(camera); look.free = true; look.pmin = -0.6; look.pmax = 1.15;
+  camera.position.set(0, 1.62, 5.5); look.yaw = look.tYaw = 0; look.pitch = look.tPitch = 0.16; $('#css3d').classList.add('off'); layoutBar();
+}
+function enterExperiencePage() { prepareExperience(); refresh(); enterExperience(); }
+
 start().catch(err => { console.error(err); $('#loader').querySelector('p').textContent = 'No se pudo cargar la experiencia. Recarga la página.'; });
 
 })();
